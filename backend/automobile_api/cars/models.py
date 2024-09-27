@@ -26,8 +26,8 @@ class Car(models.Model):
     )
     year = models.PositiveIntegerField(
         verbose_name='Год выпуска',
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         validators=(CarYearValidator(),)
     )
     description = models.TextField(

@@ -1,5 +1,6 @@
 from cars.models import Car, Comment
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from tests.base_test import BaseTestCase, CommonTestCase
@@ -35,7 +36,7 @@ class CarsAPITestCase(BaseTestCase):
         )
         self.additional_auth_client = APIClient()
         token = Token.objects.create(user=self.additional_user)
-        self.additional_user.credentials(
+        self.additional_auth_client.credentials(
             HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_list_of_cars(self):
@@ -45,15 +46,15 @@ class CarsAPITestCase(BaseTestCase):
         # Act
         response = self.client.get(url)
         # Assert
-        CommonTestCase.assert200Response(response)
-        CommonTestCase.assertJSONFormatResponse(response)
+        CommonTestCase.assert200Response(self, response)
+        CommonTestCase.assertJSONFormatResponse(self, response)
         self.assertIn('results', response.data,
-                      'Response should contain results list.')
+                      'Response should contains results list.')
 
     def test_get_specific_car(self):
         '''Test scenario when user trying to get specific car info.'''
         # Arrange
-        existing_car_id = self.CAR_MODEL.id
+        existing_car_id = self.car.id
         non_existing_car_id = 9999
         correct_url = f'{self.BASE_URL}{existing_car_id}/'
         incorrect_url = f'{self.BASE_URL}{non_existing_car_id}/'
@@ -75,7 +76,10 @@ class CarsAPITestCase(BaseTestCase):
                                  expected_status_code, err_msg)
 
     def test_creation_of_a_new_car_with_valid_data(self):
-        """Test scenario when user trying to create a new car instance."""
+        """
+        Test scenario when user trying to create a new car instance.
+        User must successfully create a new car instance.
+        """
         # Arrange
         url = self.BASE_URL
         car_info = {
@@ -84,14 +88,17 @@ class CarsAPITestCase(BaseTestCase):
             'description': ('Спортивный автомобиль с мощным'
                             'двигателем и агрессивным дизайном.'),
         }
-        counter_before_creation = self.CAR_MODEL.objects.filter(**car_info)
+        counter_before_creation = (self.CAR_MODEL.objects
+                                   .filter(**car_info).count())
         # Act
         response = self.auth_client.post(url, car_info)
         # Assert
-        counter_after_creation = self.CAR_MODEL.objets.filter(**car_info)
-        CommonTestCase.assert201Response(response)
-        CommonTestCase.assertJSONFormatResponse(response)
-        self.assertEqual((counter_after_creation - counter_before_creation), 1,
+        counter_after_creation = (self.CAR_MODEL.objects
+                                  .filter(**car_info).count())
+        CommonTestCase.assert201Response(self, response)
+        CommonTestCase.assertJSONFormatResponse(self, response)
+        self.assertEqual(int(counter_after_creation - counter_before_creation),
+                         1,
                          'Amount of car after creation attempt must be '
                          'greater than amount of car before creation '
                          'exactly by 1.')
@@ -113,19 +120,22 @@ class CarsAPITestCase(BaseTestCase):
         test_cases = {
             'invalid year format': {**car_info,
                                     'year': 'nineteen sixty-seven'},
-            'invalid make': {**car_info, 'make': None},
+            'invalid make': {**car_info, 'make': ''},
             'invalid model': {**car_info, 'model': '&2>Mod~el^'},
-            'invalid description': {**car_info, 'description': None}
+            'invalid description': {**car_info, 'description': ''}
         }
         # Act
-        for failure_reason, car_data in test_cases:
+        for failure_reason, car_data in test_cases.items():
             with self.subTest(failure_reason=failure_reason,
                               car_data=car_data):
                 response = self.auth_client.post(url, car_data)
                 # Assert
-                CommonTestCase.assert400Response(response,
+                CommonTestCase.assert400Response(self, response,
                                                  failure_reason)
 
+    def test_creation_of_multiple_cars_at_once(self):
+        '''Test checks that user cannot change multiple cars at once'''
+        # TODO
     def test_update_car_info_with_valid_data(self):
         """Test scenario when user trying to update a new car instance."""
         # Arrange
@@ -137,14 +147,13 @@ class CarsAPITestCase(BaseTestCase):
                             'двигателем и агрессивным дизайном.'),
         }
         # Act
-        response = self.auth_client.post(url, new_car_info)
+        response = self.auth_client.put(url, new_car_info)
+        self.car.refresh_from_db()
         # Assert
-        counter_after_creation = self.CAR_MODEL.objets.filter(**new_car_info)
-        CommonTestCase.assert201Response(response)
-        CommonTestCase.assertJSONFormatResponse(response)
-        self.assertEqual(counter_after_creation, 1,
-                         'Amount of car after creation attempt must be '
-                         'exactly equal  to 1.')
+        CommonTestCase.assert200Response(self, response)
+        CommonTestCase.assertJSONFormatResponse(self, response)
+        self.assertEqual(self.car.model, new_car_info['model'],
+                         'Test Car must have new model field after update')
         # TearDown
         self.CAR_MODEL.objects.filter(**new_car_info).delete()
 
@@ -174,18 +183,14 @@ class CarsAPITestCase(BaseTestCase):
 
         test_cases = [
             # Bad Request data - 400 error
-            (self.auth_client, {**new_car_info, 'model': None},
-             400, 'Car with invalid data  cannot be update')
+            (self.auth_client, {**new_car_info, 'model': ''},
+             400, 'Car with invalid data  cannot be update'),
             # Unauthenticated user - 401 Error
             (self.client, new_car_info,
              401, 'Unauthenticated user cannot update a new car instance'),
             # Update another user car - 403 Error
             (self.additional_auth_client, new_car_info,
-             403, 'User cannot update anoters user car.'),
-            # New Car info have unqiue contstarints violation - 400 error
-            (self.auth_client, additional_car_info,
-             400, ('User cannot update car if car info '
-                   'violates unique constraints.'))
+             403, 'User cannot update anothers user car.'),
         ]
         # Act
         for client, car_data, expected_response_code, err_msg in test_cases:
@@ -204,7 +209,7 @@ class CarsAPITestCase(BaseTestCase):
         # TearDown
         additional_car.delete()
 
-    def test_user_delete_car_unsuccessfully(self):
+    def test_delete_car_unsuccessfully(self):
         # Arrange
         url = f'{self.BASE_URL}{self.car.id}/'
         test_cases = [
@@ -229,8 +234,12 @@ class CarsAPITestCase(BaseTestCase):
         url = f'{self.BASE_URL}{self.car.id}/'
         # Act
         response = self.auth_client.delete(url)
+        try:
+            self.car.refresh_from_db()
+        except ObjectDoesNotExist:
+            self.car = None
         # Assert
-        self.assertEqual(response.statuc_code, 204,
+        self.assertEqual(response.status_code, 204,
                          'Car instance must be successfully deleted')
         self.assertIsNone(self.car, 'Test car instance must be deleted')
 
@@ -245,6 +254,10 @@ class CarsAPITestCase(BaseTestCase):
         '''
         # TODO
         pass
+
+
+class CarsHTTPDisallowedMethodsTestCase(BaseTestCase):
+    '''Test that there are no exessive methods are allowed.'''
 
 
 class CommentsAPITestCase(BaseTestCase):

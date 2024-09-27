@@ -28,7 +28,7 @@ class CarYearValidator(RegexValidator):
         if invalid_input:
             raise ValidationError(self.message, code=self.code,
                                   params={"value": value})
-        elif int(self.regex) < 1885:
+        elif int(value) < 1885:
             raise ValidationError(
                 'Год не может быть меньше 1885.',
                 code=self.code,

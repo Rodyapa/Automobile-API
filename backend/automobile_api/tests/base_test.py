@@ -24,20 +24,22 @@ class BaseTestCase(TestCase):
             HTTP_AUTHORIZATION='Token ' + token.key)
 
 
-class CommonTestCase:
+class CommonTestCase(TestCase):
     """Class contains common assertions methods."""
 
-    @staticmethod
-    def assert200Response(self, response: HttpResponse):
-        TestCase.assertEqual(response.status_code, 200,
-                             'Response status code must be 200.')
+    def assert200Response(self, response: HttpResponse,
+                          verbose=True):
+        self.assertEqual(response.status_code, 200,
+                         'Response status code must be 200.')
 
-    @staticmethod
-    def assert201Response(self, response: HttpResponse):
-        TestCase.assertEqual(response.status_code, 201,
-                             'Response status code must be 201.')
+    def assert201Response(self, response: HttpResponse,
+                          verbose=True):
+        msg = 'Response status code must be 200.'
+        if verbose:
+            msg += f'\n Response data: {response.data}'
+        self.assertEqual(response.status_code, 201,
+                         msg)
 
-    @staticmethod
     def assert400Response(self, response: HttpResponse,
                           expected_reason: str | None = None):
         '''
@@ -48,11 +50,10 @@ class CommonTestCase:
         if expected_reason:
             msg += (f'Because: \n'
                     f'{expected_reason}')
-        TestCase.assertEqual(response.status_code, 400,
-                             msg)
+        self.assertEqual(response.status_code, 400,
+                         msg)
 
-    @staticmethod
     def assertJSONFormatResponse(self, response: HttpResponse):
-        TestCase.assertEqual(response.headers['Content-Type'],
-                             'application/json',
-                             'Response format must be a JSON.')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json',
+                         'Response format must be a JSON.')
