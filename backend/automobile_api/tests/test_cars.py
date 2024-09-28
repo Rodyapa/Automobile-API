@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from tests.base_test import BaseTestCase, CommonTestCase
+from time import sleep
 
 UserModel = get_user_model()
 '''Tests related to Cars API endpoints'''
@@ -244,16 +245,71 @@ class CarsAPITestCase(BaseTestCase):
         self.assertIsNone(self.car, 'Test car instance must be deleted')
 
     def test_updated_at_field_of_car_model(self):
-        '''Test that "updated_at" field updates dynamically'''
-        # TODO
-        pass
+        '''Test that "updated_at" field updates dynamically.'''
+        # Arrange
+        url = f'{self.BASE_URL}{self.car.id}/'
+        before_update = self.car.updated_at
+        new_car_info = {
+            'make': 'Ford',
+            'model': 'Mustang Shelby',
+            'description': ('Спортивный автомобиль с мощным'
+                            'двигателем и агрессивным дизайном.'),
+        }
+        # Act
+        response = self.auth_client.put(url, new_car_info)
+        self.car.refresh_from_db()
+        after_update = self.car.updated_at
+        # Assert
+        CommonTestCase.assert200Response(self, response)
+        self.assertNotEqual(before_update, after_update,
+                            '"updated_at field must be changed '
+                            'after put request"')
+
+    def test_created_at_field_of_a_car_model(self):
+        '''Test that created_at field does not update after creation.'''
+        # Arrange
+        url = f'{self.BASE_URL}{self.car.id}/'
+        before_update = self.car.created_at
+        new_car_info = {
+            'make': 'Ford',
+            'model': 'Mustang Shelby',
+            'description': ('Спортивный автомобиль с мощным'
+                            'двигателем и агрессивным дизайном.'),
+        }
+        # Act
+        response = self.auth_client.put(url, new_car_info)
+        self.car.refresh_from_db()
+        after_update = self.car.created_at
+        # Assert
+        CommonTestCase.assert200Response(self, response)
+        self.assertEqual(before_update, after_update,
+                         '"created_at field must remains te same '
+                         'after put request"')
 
     def test_owner_of_a_car_is_request_user(self):
         '''
-        Check that request user will be recorded as owner of new car instance
+        Check that request user will be recorded as owner of new car instance.
         '''
-        # TODO
-        pass
+        # Arrange
+        url = self.BASE_URL
+        new_car_info = {
+            'make': 'Chevrolet',
+            'model': 'Camaro',
+            'description': ('Как в трансформерах.'),
+        }
+        # Act
+        response = self.auth_client.post(url, new_car_info)
+        # Assert
+        CommonTestCase.assert201Response(self, response)
+        new_car = self.CAR_MODEL.objects.latest('created_at')
+        self.assertEqual(self.auth_user, new_car.owner)
+
+
+class CarsAPIManualChangeRestrictionTestCase(BaseTestCase):
+    '''
+    Test that user can not manually change fields
+    that not purposed to be updated.
+    '''
 
 
 class CarsHTTPDisallowedMethodsTestCase(BaseTestCase):
