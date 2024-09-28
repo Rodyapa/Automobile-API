@@ -11,7 +11,7 @@ class BaseTestCase(TestCase):
     """Class provides prearranged data."""
     @classmethod
     def setUpTestData(cls):
-        cls.auth_user = UserModel.objects.create(
+        cls.auth_user = UserModel.objects.create_user(
             username='username',
             first_name='user',
             last_name='surname',
@@ -29,12 +29,15 @@ class CommonTestCase(TestCase):
 
     def assert200Response(self, response: HttpResponse,
                           verbose=True):
+        msg = 'Response status code must be 200.'
+        if verbose:
+            msg += f'\n Response data: {response.data}'
         self.assertEqual(response.status_code, 200,
-                         'Response status code must be 200.')
+                         msg)
 
     def assert201Response(self, response: HttpResponse,
                           verbose=True):
-        msg = 'Response status code must be 200.'
+        msg = 'Response status code must be 201.'
         if verbose:
             msg += f'\n Response data: {response.data}'
         self.assertEqual(response.status_code, 201,

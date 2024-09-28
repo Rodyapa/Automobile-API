@@ -6,5 +6,6 @@ app_name = 'api'
 api_v1 = DefaultRouter()
 api_v1.register(r'cars', CarViewSet, basename='cars')
 urlpatterns = [
-    path('', include(api_v1.urls))
+    path('', include(api_v1.urls)),
+    path('auth/', include('djoser.urls.jwt')),
 ]

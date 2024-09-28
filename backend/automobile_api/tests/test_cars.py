@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from tests.base_test import BaseTestCase, CommonTestCase
-from time import sleep
 
 UserModel = get_user_model()
 '''Tests related to Cars API endpoints'''
@@ -32,7 +31,7 @@ class CarsAPITestCase(BaseTestCase):
             'password': 'Strong_password1',
             'email': 'aux_user@gmail.com',
         }
-        self.additional_user = UserModel.objects.create(
+        self.additional_user = UserModel.objects.create_user(
             **self.additional_user_info
         )
         self.additional_auth_client = APIClient()
