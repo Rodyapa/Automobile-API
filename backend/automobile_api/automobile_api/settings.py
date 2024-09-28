@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'admin_site.apps.AdminSiteConfig',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
-    'cars.apps.CarsConfig'
+    'cars.apps.CarsConfig',
+    'core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [
