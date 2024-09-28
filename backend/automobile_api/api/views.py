@@ -18,6 +18,7 @@ class CarViewSet(mixins.ListModelMixin,
     queryset = Car.objects.all()
     serializer_class = CarSerializer
     permission_classes = (IsOwnerOrIsStaffOrReadOnly, )
+    http_method_names = ['get', 'post', 'put']
 
     def perform_create(self, serializer):
         # Set the author to the request user when creating a car

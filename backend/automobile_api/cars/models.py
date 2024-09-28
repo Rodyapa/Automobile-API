@@ -1,6 +1,7 @@
 from cars.constants import MAX_CHARFIELD
 from cars.validators import CarYearValidator, TextValidator, TitleValidator
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 UserModel = get_user_model()
@@ -28,7 +29,11 @@ class Car(models.Model):
         verbose_name='Год выпуска',
         null=True,
         blank=True,
-        validators=(CarYearValidator(),)
+        max_length=4,
+        validators=(CarYearValidator(),
+                    MaxValueValidator(3000),
+                    MinValueValidator(1885,
+                                      'Год не может быть меньше 1885.'))
     )
     description = models.TextField(
         verbose_name='Описание автомобиля',

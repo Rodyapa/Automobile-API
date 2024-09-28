@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'cars.apps.CarsConfig',
-    'core.apps.CoreConfig'
+    'core.apps.CoreConfig',
+    'drf_yasg'  # For API docs
 ]
 
 MIDDLEWARE = [
