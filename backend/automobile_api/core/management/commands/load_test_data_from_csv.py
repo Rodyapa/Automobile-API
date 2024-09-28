@@ -1,10 +1,10 @@
 import csv
 import os
 
+from cars.models import Car, Comment
 from django.conf import settings
-from django.core.management.base import BaseCommand
-from cars.models import Car
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 UserModel = get_user_model()
 
@@ -21,19 +21,30 @@ def users_import(row):
 
 
 def cars_import(row):
-    owner_id = UserModel.objects.get(id=row[4])
+    owner = UserModel.objects.get(id=row[4])
     Car.objects.get_or_create(
         make=row[0],
         model=row[1],
         year=row[2],
         description=row[3],
-        owner=owner_id
+        owner=owner
+    )
+
+
+def comments_import(row):
+    car = Car.objects.get(id=row[1])
+    author = UserModel.objects.get(id=row[2])
+    Comment.objects.get_or_create(
+        content=row[0],
+        author=author,
+        car=car
     )
 
 
 action = {
     'users.csv': users_import,
     'cars.csv': cars_import,  # Must to be after user_import
+    'comments.csv': comments_import,  # Must to be after user and cars imports
 }
 
 

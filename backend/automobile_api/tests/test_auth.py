@@ -1,10 +1,4 @@
-from cars.models import Car, Comment
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient
 from tests.base_test import BaseTestCase, CommonTestCase
-from django.test import TestCase
 
 
 class JWTTokenTestCase(BaseTestCase):

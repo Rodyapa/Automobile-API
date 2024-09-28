@@ -331,6 +331,11 @@ class CommentsAPITestCase(BaseTestCase):
                          'топлива и современными технологиями безопасности.'),
             owner=self.auth_user
         )
+        self.comment = self.COMMENT_MODEL.objects.create(
+            content='Очень шустрая!',
+            author=self.auth_user,
+            car=self.car
+        )
 
     def test_get_list_of_comments_of_specific_car(self):
         '''Test that user can get a list of comments realted to specific car'''
@@ -352,7 +357,7 @@ class CommentsAPITestCase(BaseTestCase):
                 # Assert
                 self.assertEqual(response.status_code, expected_status_code,
                                  err_msg)
-                CommonTestCase.assertJSONFormatResponse(response)
+                CommonTestCase.assertJSONFormatResponse(self, response)
 
     def test_make_new_comment_to_specific_car(self):
         # Arrange
@@ -379,14 +384,25 @@ class CommentsAPITestCase(BaseTestCase):
                 self.assertEqual(response.status_code, expected_status_code,
                                  err_msg)
                 if expected_status_code == 201:
-                    self.assertEqual(self.CAR_MODEL.comments.count(), 1,
-                                     ('There should be only one '
-                                      'existing car comment'))
+                    self.assertEqual(self.COMMENT_MODEL.objects.all().count(),
+                                     2,
+                                     ('There should be only two '
+                                      'existing car comments '
+                                      '(first created at the set up)'))
 
     def test_author_of_a_comment_is_request_user(self):
         '''
         Check that request user will be recorded
         as author of new comment instance.
         '''
-        # TODO
-        pass
+        # Arrange
+        url = f'{self.BASE_URL}{self.car.id}/comments/'
+        comment = {
+            'content': 'Действительно хорошая машина'
+        }
+        # Act
+        response = self.auth_client.post(url, comment)
+        # Assert
+        CommonTestCase.assert201Response(self, response)
+        new_comment = self.COMMENT_MODEL.objects.latest('created_at')
+        self.assertEqual(self.auth_user, new_comment.author)
