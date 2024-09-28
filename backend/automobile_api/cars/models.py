@@ -29,7 +29,6 @@ class Car(models.Model):
         verbose_name='Год выпуска',
         null=True,
         blank=True,
-        max_length=4,
         validators=(CarYearValidator(),
                     MaxValueValidator(3000),
                     MinValueValidator(1885,
@@ -57,6 +56,8 @@ class Car(models.Model):
         related_name='cars'
     )
 
+    def __str__(self) -> str:
+        return f'{self.model}'
 
 class Comment(models.Model):
     '''Database model for the Car Comment entity.'''
