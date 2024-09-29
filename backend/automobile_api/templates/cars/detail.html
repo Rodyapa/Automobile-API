@@ -15,11 +15,11 @@
         <p class="card-text">{{ car.description|linebreaksbr }}</p>
         {% if user == car.owner %}
           <div class="mb-2">
-            <a class="btn btn-sm text-muted" href="{% url 'car:edit' car.id %}" role="button">
-              Отредактировать публикацию
+            <a class="btn btn-sm text-muted" href="{% url 'cars:car-edit' car.id %}" role="button">
+              Отредактировать автомобиль
             </a>
-            <a class="btn btn-sm text-muted" href="{% url 'car:delete' car.id %}" role="button">
-              Удалить публикацию
+            <a class="btn btn-sm text-muted" href="{% url 'cars:car-delete' car.id %}" role="button">
+              Удалить автомобиль
             </a>
           </div>
         {% endif %}

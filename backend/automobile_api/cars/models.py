@@ -59,6 +59,10 @@ class Car(models.Model):
     def __str__(self) -> str:
         return f'{self.model}'
 
+    class Meta:
+        ordering = ('-created_at', )
+
+
 class Comment(models.Model):
     '''Database model for the Car Comment entity.'''
     content = models.TextField(
@@ -85,3 +89,6 @@ class Comment(models.Model):
         null=False,
         related_name='comments'
     )
+
+    class Meta:
+        ordering = ('-created_at', )
