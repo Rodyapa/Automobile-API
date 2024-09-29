@@ -16,9 +16,9 @@
             {% for car in object_list %}
             <tr>
                 <td>
-                {# <a href="{% url 'cars:cars-detail' car.id %}"> #}
+                <a href="{% url 'cars:cars-detail' car.id %}"> 
                 {{car.model}}
-                {# </a> #}
+                </a> 
                 </td>
                 <td>{{car.make}}</td>
                 <td>{{car.year}}</td>

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'cars.apps.CarsConfig',
     'core.apps.CoreConfig',
+    'django_bootstrap5',
     'drf_yasg'  # For API docs
 ]
 
