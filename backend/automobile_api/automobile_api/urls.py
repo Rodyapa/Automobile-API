@@ -23,6 +23,7 @@ docs_urlpatterns = [
          name='schema-json'),
 ]
 urlpatterns = [
+    path('', include('cars.urls'), name='cars'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls'), name='api'),
     path('docs/', include(docs_urlpatterns), name='docs')
