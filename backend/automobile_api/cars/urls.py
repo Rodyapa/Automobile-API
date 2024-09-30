@@ -1,5 +1,5 @@
-from django.urls import path, include
 from cars import views
+from django.urls import include, path
 
 app_name = 'cars'
 

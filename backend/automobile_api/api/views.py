@@ -1,8 +1,8 @@
 from api.permissions import (IsAuthorOrIsStaffOrReadOnly,
                              IsOwnerOrIsStaffOrReadOnly)
 from api.serializers import CarSerializer, CommentSerializer
-from cars.models import Car, Comment
-from django.shortcuts import get_object_or_404, render
+from cars.models import Car
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -14,7 +14,10 @@ class CarViewSet(mixins.ListModelMixin,
                  mixins.UpdateModelMixin,
                  mixins.DestroyModelMixin,
                  viewsets.GenericViewSet):
-    """View set that process requests related to car instances."""
+    """
+    View set that process requests related to car instances.
+    """
+
     queryset = Car.objects.all()
     serializer_class = CarSerializer
     permission_classes = (IsOwnerOrIsStaffOrReadOnly, )
@@ -29,7 +32,9 @@ class CommentViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
                      viewsets.GenericViewSet):
-    """Вьюсет для обьектов модели Comment."""
+    """
+    View set that process requests related to car comment instances.
+    """
 
     serializer_class = CommentSerializer
     permission_classes = (

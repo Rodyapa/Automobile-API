@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import include, path, reverse_lazy
+from django.views.generic.edit import CreateView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from users.forms import CustomUserCreationForm
-from django.views.generic.edit import CreateView
 
 schema_view = get_schema_view(
     openapi.Info(

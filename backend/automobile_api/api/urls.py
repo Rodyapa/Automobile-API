@@ -9,6 +9,7 @@ api_v1.register(
     r'cars/(?P<car_id>\d+)/comments',
     CommentViewSet,
     basename='comments')
+
 urlpatterns = [
     path('', include(api_v1.urls)),
     path('auth/', include('djoser.urls.jwt')),
