@@ -1,0 +1,31 @@
+{% load static %}
+<header>
+  <nav class="navbar navbar-light" style="background-color: lightskyblue">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'cars:index' %}">
+        Автомобили
+      </a>
+        <ul class="nav  nav-pills">
+          {% if user.is_authenticated %}
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                  href="{% url 'cars:car-create' %}">Добавить автомобиль</a></button>
+            {% comment %}
+              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                  href="{% url 'logout' %}">Выйти</a></button>
+            {% endcomment %} 
+            </div>
+          {% else %}
+          {% comment %}
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                  href="{% url 'login' %}">Войти</a></button>
+              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                  href="{% url 'registration' %}">Регистрация</a></button>
+            </div>
+        {% endcomment %}
+          {% endif %}
+        </ul>
+    </div>
+  </nav>
+</header>
