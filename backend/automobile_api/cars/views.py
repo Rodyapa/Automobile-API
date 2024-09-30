@@ -65,8 +65,7 @@ class CarUpdateView(LoginRequiredMixin, UpdateView):
 
 class CarDeleteView(LoginRequiredMixin, DeleteView):
     model = Car
-    form_class = CarForm
-    template_name = "cars/create.html"
+    template_name = "cars/delete.html"
     success_url = reverse_lazy("cars:index")
 
     def get_context_data(self, **kwargs):
