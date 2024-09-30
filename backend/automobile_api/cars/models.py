@@ -92,3 +92,6 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created_at', )
+
+    def __str__(self) -> str:
+        return f'{self.car.model}|{self.author}'
