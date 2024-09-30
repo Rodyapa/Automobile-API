@@ -10,20 +10,18 @@
             <div class="btn-group" role="group" aria-label="Basic outlined example">
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'cars:car-create' %}">Добавить автомобиль</a></button>
-            {% comment %}
-              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'logout' %}">Выйти</a></button>
-            {% endcomment %} 
+                  <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary">Выйти</button>
+                  </form>
             </div>
           {% else %}
-          {% comment %}
             <div class="btn-group" role="group" aria-label="Basic outlined example">
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'login' %}">Войти</a></button>
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'registration' %}">Регистрация</a></button>
             </div>
-        {% endcomment %}
           {% endif %}
         </ul>
     </div>
