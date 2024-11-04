@@ -1,4 +1,4 @@
-# Automobile-API (Тестовое задание)
+# Automobile-API
 ## Endpoints
 * /api/docs/swagger/ - Документация эндпоинтов.
 ## Просмотр проекта на локальной машине:
